@@ -70,7 +70,7 @@ const Navbar = () => {
         </ol>
         <div>
           <Button>Sign In</Button>
-          <Button varient={"primary"}>Sign Up</Button>
+          <Button variant={"primary"}>Sign Up</Button>
         </div>
       </nav>
     </header>
