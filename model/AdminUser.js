@@ -1,29 +1,34 @@
 import mongoose from "mongoose";
 
-const SubjectSchema = new mongoose.Schema({
+const AdminUserSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
     trim: true,
   },
-  code: {
+  email: {
     type: String,
     required: true,
     unique: true,
+    lowercase: true,
     trim: true,
   },
-  description: {
+  password: {
     type: String,
-    default: "",
-  },
-  year: {
-    type: Number,
     required: true,
-    enum: [1, 2, 3, 4],
+  },
+  role: {
+    type: String,
+    enum: ["admin", "superadmin"],
+    default: "admin",
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
   },
   department: {
     type: String,
-    required: true,
+    default: "",
   },
   createdAt: {
     type: Date,
@@ -35,6 +40,6 @@ const SubjectSchema = new mongoose.Schema({
   },
 });
 
-const Subject = mongoose.models.Subject || mongoose.model("Subject", SubjectSchema);
+const AdminUser = mongoose.models.AdminUser || mongoose.model("AdminUser", AdminUserSchema);
 
-export default Subject;
+export default AdminUser;
