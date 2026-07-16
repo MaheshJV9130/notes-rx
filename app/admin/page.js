@@ -171,6 +171,14 @@ function UploadNotesTab() {
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [showAddSubjectModal, setShowAddSubjectModal] = useState(false);
+  const [newSubjectForm, setNewSubjectForm] = useState({
+    name: "",
+    code: "",
+    description: "",
+    department: "",
+  });
+  const [addingSubject, setAddingSubject] = useState(false);
 
   useEffect(() => {
     fetchSubjects();
@@ -225,6 +233,43 @@ function UploadNotesTab() {
       setChapters(data.data || []);
     } catch (error) {
       console.error("Error fetching chapters:", error);
+    }
+  };
+
+  const handleAddSubject = async (e) => {
+    e.preventDefault();
+    if (!newSubjectForm.name || !newSubjectForm.code || !newSubjectForm.department) {
+      setMessage("Please fill all required fields");
+      return;
+    }
+
+    setAddingSubject(true);
+
+    try {
+      const res = await fetch("/api/subjects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...newSubjectForm,
+          year: formData.year,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to create subject");
+      }
+
+      const newSubject = await res.json();
+      setSubjects([...subjects, newSubject.data]);
+      setNewSubjectForm({ name: "", code: "", description: "", department: "" });
+      setShowAddSubjectModal(false);
+      setMessage("Subject added successfully!");
+      setTimeout(() => setMessage(""), 3000);
+    } catch (error) {
+      console.error("Error adding subject:", error);
+      setMessage("Error adding subject: " + error.message);
+    } finally {
+      setAddingSubject(false);
     }
   };
 
@@ -348,19 +393,28 @@ function UploadNotesTab() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Subject
             </label>
-            <select
-              value={formData.subject}
-              onChange={(e) => handleSubjectChange(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-            >
-              <option value="">Select Subject</option>
-              {subjects.map((subject) => (
-                <option key={subject._id} value={subject._id}>
-                  {subject.name}
-                </option>
-              ))}
-            </select>
+            <div className="flex gap-2">
+              <select
+                value={formData.subject}
+                onChange={(e) => handleSubjectChange(e.target.value)}
+                required
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              >
+                <option value="">Select Subject</option>
+                {subjects.map((subject) => (
+                  <option key={subject._id} value={subject._id}>
+                    {subject.name}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={() => setShowAddSubjectModal(true)}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
+              >
+                + Add
+              </button>
+            </div>
           </div>
         </div>
 
@@ -405,6 +459,92 @@ function UploadNotesTab() {
           {loading ? "Uploading..." : "Upload Note"}
         </button>
       </form>
+
+      {showAddSubjectModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
+            <h4 className="text-xl font-bold text-gray-900 mb-4">Add New Subject</h4>
+            <form onSubmit={handleAddSubject} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Subject Name *
+                </label>
+                <input
+                  type="text"
+                  value={newSubjectForm.name}
+                  onChange={(e) =>
+                    setNewSubjectForm({ ...newSubjectForm, name: e.target.value })
+                  }
+                  placeholder="e.g., Mathematics"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Subject Code *
+                </label>
+                <input
+                  type="text"
+                  value={newSubjectForm.code}
+                  onChange={(e) =>
+                    setNewSubjectForm({ ...newSubjectForm, code: e.target.value })
+                  }
+                  placeholder="e.g., MATH101"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Department *
+                </label>
+                <input
+                  type="text"
+                  value={newSubjectForm.department}
+                  onChange={(e) =>
+                    setNewSubjectForm({ ...newSubjectForm, department: e.target.value })
+                  }
+                  placeholder="e.g., Science"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
+                <textarea
+                  value={newSubjectForm.description}
+                  onChange={(e) =>
+                    setNewSubjectForm({ ...newSubjectForm, description: e.target.value })
+                  }
+                  placeholder="Optional description"
+                  rows="3"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+
+              <div className="flex gap-2 pt-4">
+                <button
+                  type="submit"
+                  disabled={addingSubject}
+                  className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition disabled:opacity-50 font-medium"
+                >
+                  {addingSubject ? "Adding..." : "Add Subject"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAddSubjectModal(false)}
+                  className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition font-medium"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
