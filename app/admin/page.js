@@ -179,10 +179,16 @@ function UploadNotesTab() {
   const fetchSubjects = async () => {
     try {
       const res = await fetch("/api/subjects/1");
+      if (!res.ok) {
+        console.error("Failed to fetch subjects:", res.status);
+        setSubjects([]);
+        return;
+      }
       const data = await res.json();
-      setSubjects(data || []);
+      setSubjects(Array.isArray(data) ? data : data.data || []);
     } catch (error) {
       console.error("Error fetching subjects:", error);
+      setSubjects([]);
     }
   };
 
@@ -192,10 +198,16 @@ function UploadNotesTab() {
 
     try {
       const res = await fetch(`/api/subjects/${year}`);
+      if (!res.ok) {
+        console.error("Failed to fetch subjects:", res.status);
+        setSubjects([]);
+        return;
+      }
       const data = await res.json();
-      setSubjects(data || []);
+      setSubjects(Array.isArray(data) ? data : data.data || []);
     } catch (error) {
       console.error("Error fetching subjects:", error);
+      setSubjects([]);
     }
   };
 

@@ -5,7 +5,7 @@ import { existsSync } from "fs";
 
 export async function GET(req, { params }) {
   try {
-    const { filename } = params;
+    const { filename } = await params;
 
     // Security: Prevent directory traversal attacks
     if (filename.includes("..") || filename.includes("/")) {

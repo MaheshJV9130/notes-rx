@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 export async function GET(req, { params }) {
   try {
     await database();
-    const { year } = params;
+    const { year } = await params;
 
     // Validate and parse year
     const parsedYear = parseInt(year, 10);
