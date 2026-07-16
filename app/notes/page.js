@@ -19,17 +19,25 @@ export default function NotesPage() {
     const fetchSubjects = async () => {
       try {
         const res = await fetch(`/api/subjects/${selectedYear}`);
+        if (!res.ok) {
+          console.error("Failed to fetch subjects:", res.status);
+          setSubjects([]);
+          return;
+        }
         const data = await res.json();
-        setSubjects(data || []);
+        setSubjects(Array.isArray(data) ? data : data.data || []);
         setSelectedSubject("");
         setChapters([]);
         setNotes([]);
       } catch (error) {
         console.error("Error fetching subjects:", error);
+        setSubjects([]);
       }
     };
 
-    fetchSubjects();
+    if (selectedYear >= 1 && selectedYear <= 4) {
+      fetchSubjects();
+    }
   }, [selectedYear]);
 
   // Fetch chapters when subject changes
