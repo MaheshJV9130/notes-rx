@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+body {
+ 
+  font-family: var(--font-poppins) Arial, Helvetica, sans-serif;
+}
+
+.browser-warning {
+  margin-bottom: 4rem;
+}
+
