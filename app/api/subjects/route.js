@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 export async function GET(req) {
   try {
     await database();
-    const subjects = await Subject.find().select("-__v").sort({ year: 1, name: 1 });
+    const subjects = await Subject.find().select("-__v").sort({ year: 1, name: 1 }).lean();
 
     if (!subjects || subjects.length === 0) {
       return NextResponse.json(
