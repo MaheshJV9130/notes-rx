@@ -82,3 +82,105 @@ export async function POST(req) {
     );
   }
 }
+
+export async function PUT(req) {
+  try {
+    await database();
+    const body = await req.json();
+    const { id, title, description, subject, chapter, year, pdfFileName, pdfSize } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "Note ID is required" },
+        { status: 400 }
+      );
+    }
+
+    if (!title || !subject || !chapter || !year) {
+      return NextResponse.json(
+        { message: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    const updateData = {
+      title,
+      description,
+      subject,
+      chapter,
+      year,
+      updatedAt: new Date(),
+    };
+
+    // Only update PDF filename if a new one is provided
+    if (pdfFileName) {
+      updateData.pdfFileName = pdfFileName;
+    }
+    if (pdfSize) {
+      updateData.pdfSize = pdfSize;
+    }
+
+    const updatedNote = await Note.findByIdAndUpdate(id, updateData, {
+      new: true,
+    })
+      .populate("subject", "name code")
+      .populate("chapter", "chapterNumber title")
+      .populate("uploadedBy", "name email");
+
+    if (!updatedNote) {
+      return NextResponse.json(
+        { message: "Note not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      { message: "Note updated successfully", data: updatedNote },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error updating note:", error);
+    return NextResponse.json(
+      { message: "Error updating note", error: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req) {
+  try {
+    await database();
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "Note ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const deletedNote = await Note.findByIdAndDelete(id);
+
+    if (!deletedNote) {
+      return NextResponse.json(
+        { message: "Note not found" },
+        { status: 404 }
+      );
+    }
+
+    // Optional: Delete the associated PDF file from storage
+    // This would require integrating with Vercel Blob or another storage service
+
+    return NextResponse.json(
+      { message: "Note deleted successfully", data: deletedNote },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error deleting note:", error);
+    return NextResponse.json(
+      { message: "Error deleting note", error: error.message },
+      { status: 500 }
+    );
+  }
+}
