@@ -1,13 +1,8 @@
-import pdfParse from "pdf-parse";
 import sharp from "sharp";
 
 export async function extractFirstPageThumbnail(pdfBuffer) {
   try {
-    console.log("[v0] Extracting PDF metadata...");
-    
-    // Parse PDF to verify it's valid
-    const pdfData = await pdfParse(pdfBuffer);
-    console.log("[v0] PDF has", pdfData.numpages, "pages");
+    console.log("[v0] Generating placeholder thumbnail...");
 
     // Create a simple placeholder thumbnail since server-side PDF rendering is complex
     // The thumbnail can be generated client-side using PDF.js when viewing
