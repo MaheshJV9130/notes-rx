@@ -72,8 +72,9 @@ export async function uploadToB2(fileName, fileBuffer, mimeType = "application/p
 
     return uploadResponse.data;
   } catch (error) {
-    console.error("[v0] B2 upload error:", error);
-    throw new Error("Failed to upload file to B2: " + error.message);
+    console.error("[v0] B2 upload error:", error.message);
+    // Return a flag indicating B2 failed so caller can use fallback
+    throw { isB2Error: true, message: error.message };
   }
 }
 

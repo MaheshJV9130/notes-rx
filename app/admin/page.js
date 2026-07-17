@@ -412,10 +412,9 @@ function UploadNotesTab() {
               <select
                 value={formData.subject}
                 onChange={(e) => handleSubjectChange(e.target.value)}
-                required
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
               >
-                <option value="">Select Subject</option>
+                <option value="">Select Subject (Optional)</option>
                 {subjects.map((subject) => (
                   <option key={subject._id} value={subject._id}>
                     {subject.name}
