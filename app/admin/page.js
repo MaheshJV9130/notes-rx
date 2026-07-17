@@ -168,7 +168,6 @@ function UploadNotesTab() {
   });
   const [file, setFile] = useState(null);
   const [subjects, setSubjects] = useState([]);
-  const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [showAddSubjectModal, setShowAddSubjectModal] = useState(false);
@@ -202,7 +201,6 @@ function UploadNotesTab() {
 
   const handleYearChange = async (year) => {
     setFormData({ ...formData, year: parseInt(year), subject: "", chapter: "" });
-    setChapters([]);
 
     try {
       const res = await fetch(`/api/subjects/${year}`);
@@ -219,21 +217,8 @@ function UploadNotesTab() {
     }
   };
 
-  const handleSubjectChange = async (subjectId) => {
+  const handleSubjectChange = (subjectId) => {
     setFormData({ ...formData, subject: subjectId, chapter: "" });
-
-    if (!subjectId) {
-      setChapters([]);
-      return;
-    }
-
-    try {
-      const res = await fetch(`/api/chapters?subject=${subjectId}`);
-      const data = await res.json();
-      setChapters(data.data || []);
-    } catch (error) {
-      console.error("Error fetching chapters:", error);
-    }
   };
 
   const handleAddSubject = async (e) => {
@@ -424,21 +409,16 @@ function UploadNotesTab() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Chapter
+            Chapter Name
           </label>
-          <select
+          <input
+            type="text"
             value={formData.chapter}
             onChange={(e) => setFormData({ ...formData, chapter: e.target.value })}
             required
+            placeholder="e.g., Introduction to Physics"
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-          >
-            <option value="">Select Chapter</option>
-            {chapters.map((chapter) => (
-              <option key={chapter._id} value={chapter._id}>
-                Chapter {chapter.chapterNumber}: {chapter.title}
-              </option>
-            ))}
-          </select>
+          />
         </div>
 
         <div>
