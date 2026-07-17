@@ -215,27 +215,49 @@ export default function NotesPage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredNotes.map((note) => (
-                    <Link key={note._id} href={`/view/${note.pdfFileName}`}>
-                      <div className="h-full bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow cursor-pointer p-6">
-                        <div className="flex items-start gap-3 mb-3">
-                          <FiBook className="text-blue-600 flex-shrink-0 mt-1" />
-                          <h3 className="font-semibold text-gray-900 line-clamp-2">
+                    <Link 
+                      key={note._id} 
+                      href={`/view?pdfUrl=${encodeURIComponent(note.pdfUrl || ``)}`}
+                    >
+                      <div className="h-full bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow cursor-pointer overflow-hidden">
+                        {/* Thumbnail */}
+                        <div className="w-full h-40 bg-gray-200 overflow-hidden flex items-center justify-center border-b border-gray-200">
+                          {note.thumbnailUrl ? (
+                            <img
+                              src={note.thumbnailUrl}
+                              alt={note.title}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.style.display = "none";
+                              }}
+                            />
+                          ) : (
+                            <div className="flex flex-col items-center justify-center text-gray-400">
+                              <FiBook size={32} />
+                              <span className="text-xs mt-2">PDF</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-4">
+                          <h3 className="font-semibold text-gray-900 line-clamp-2 mb-2">
                             {note.title}
                           </h3>
-                        </div>
-                        <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                          {note.description || "No description available"}
-                        </p>
-                        <div className="space-y-2 text-xs text-gray-500">
-                          <p>
-                            Subject: <span className="font-medium text-gray-700">{note.subject?.name}</span>
+                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                            {note.description || "No description available"}
                           </p>
-                          <p>
-                            Chapter: <span className="font-medium text-gray-700">{note.chapter?.chapterNumber}</span>
-                          </p>
-                          <p>
-                            Views: <span className="font-medium text-gray-700">{note.views}</span>
-                          </p>
+                          <div className="space-y-1 text-xs text-gray-500">
+                            <p>
+                              Subject: <span className="font-medium text-gray-700">{note.subject?.name}</span>
+                            </p>
+                            <p>
+                              Chapter: <span className="font-medium text-gray-700">{note.chapter?.chapterNumber}</span>
+                            </p>
+                            <p>
+                              Views: <span className="font-medium text-blue-600">{note.views}</span>
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </Link>

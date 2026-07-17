@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
+import { uploadToB2, getB2PublicUrl } from "@/utils/b2Client";
+import { extractFirstPageThumbnail } from "@/utils/pdfThumbnail";
 
 export async function POST(req) {
   try {
@@ -32,35 +31,60 @@ export async function POST(req) {
     }
 
     const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const pdfBuffer = Buffer.from(bytes);
 
-    // Create uploads directory if it doesn't exist
-    const uploadDir = join(process.cwd(), "public", "uploads");
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
-    }
-
-    // Generate unique filename
+    // Generate unique filenames
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(7);
-    const filename = `${timestamp}_${randomString}_${file.name}`;
-    const filepath = join(uploadDir, filename);
+    const pdfFileName = `pdf/${timestamp}_${randomString}_${file.name}`;
+    const thumbnailFileName = `thumbnails/${timestamp}_${randomString}_thumbnail.png`;
 
-    // Write file to disk
-    await writeFile(filepath, buffer);
+    console.log("[v0] Uploading PDF to B2:", pdfFileName);
+
+    // Upload PDF to B2
+    const pdfUploadResponse = await uploadToB2(pdfFileName, pdfBuffer, "application/pdf");
+    const pdfUrl = getB2PublicUrl(pdfFileName);
+
+    console.log("[v0] PDF uploaded successfully. URL:", pdfUrl);
+
+    // Extract and upload thumbnail
+    let thumbnailUrl = null;
+    let b2ThumbnailId = null;
+
+    try {
+      console.log("[v0] Extracting thumbnail...");
+      const thumbnailBuffer = await extractFirstPageThumbnail(pdfBuffer);
+      
+      console.log("[v0] Uploading thumbnail to B2:", thumbnailFileName);
+      const thumbnailUploadResponse = await uploadToB2(
+        thumbnailFileName,
+        thumbnailBuffer,
+        "image/png"
+      );
+      
+      thumbnailUrl = getB2PublicUrl(thumbnailFileName);
+      b2ThumbnailId = thumbnailUploadResponse.fileId;
+      console.log("[v0] Thumbnail uploaded successfully. URL:", thumbnailUrl);
+    } catch (thumbError) {
+      console.warn("[v0] Thumbnail extraction failed, continuing without thumbnail:", thumbError.message);
+    }
 
     return NextResponse.json(
       {
         message: "File uploaded successfully",
-        filename: filename,
+        filename: pdfFileName,
         size: file.size,
         type: file.type,
         originalName: file.name,
+        pdfUrl: pdfUrl,
+        thumbnailUrl: thumbnailUrl,
+        b2FileId: pdfUploadResponse.fileId,
+        b2ThumbnailId: b2ThumbnailId,
       },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error uploading file:", error);
+    console.error("[v0] Error uploading file:", error);
     return NextResponse.json(
       { message: "Error uploading file", error: error.message },
       { status: 500 }

@@ -44,9 +44,22 @@ export async function POST(req) {
     await database();
     const body = await req.json();
 
-    const { title, description, subject, chapter, year, pdfFileName, pdfSize, uploadedBy } = body;
+    const { 
+      title, 
+      description, 
+      subject, 
+      chapter, 
+      year, 
+      pdfFileName, 
+      pdfSize, 
+      uploadedBy,
+      pdfUrl,
+      thumbnailUrl,
+      b2FileId,
+      b2ThumbnailId
+    } = body;
 
-    if (!title || !subject || !chapter || !year || !pdfFileName || !uploadedBy) {
+    if (!title || !subject || !chapter || !year || !pdfFileName || !uploadedBy || !pdfUrl) {
       return NextResponse.json(
         { message: "Missing required fields" },
         { status: 400 }
@@ -61,6 +74,10 @@ export async function POST(req) {
       year,
       pdfFileName,
       pdfSize,
+      pdfUrl,
+      thumbnailUrl,
+      b2FileId,
+      b2ThumbnailId,
       uploadedBy,
     });
 
@@ -75,7 +92,7 @@ export async function POST(req) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Error creating note:", error);
+    console.error("[v0] Error creating note:", error);
     return NextResponse.json(
       { message: "Error creating note", error: error.message },
       { status: 500 }

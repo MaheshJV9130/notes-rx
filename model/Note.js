@@ -33,6 +33,23 @@ const NoteSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  pdfUrl: {
+    type: String,
+    required: true,
+    description: "Public B2 URL for the PDF file",
+  },
+  thumbnailUrl: {
+    type: String,
+    description: "Public B2 URL for the PDF first page thumbnail",
+  },
+  b2FileId: {
+    type: String,
+    description: "B2 file ID for future deletion",
+  },
+  b2ThumbnailId: {
+    type: String,
+    description: "B2 thumbnail file ID for future deletion",
+  },
   uploadedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "AdminUser",

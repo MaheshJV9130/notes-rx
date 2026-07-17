@@ -309,6 +309,10 @@ function UploadNotesTab() {
           ...formData,
           pdfFileName: uploadData.filename,
           pdfSize: uploadData.size,
+          pdfUrl: uploadData.pdfUrl,
+          thumbnailUrl: uploadData.thumbnailUrl,
+          b2FileId: uploadData.b2FileId,
+          b2ThumbnailId: uploadData.b2ThumbnailId,
           uploadedBy: admin._id,
         }),
       });

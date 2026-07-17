@@ -21,11 +21,12 @@ export default function PDFViewerPage() {
   const [scale, setScale] = useState(1.5);
   const [error, setError] = useState(null);
 
+  const pdfUrl = searchParams.get("pdfUrl") || "";
   const filename = searchParams.get("file") || "";
 
   // Load PDF
   useEffect(() => {
-    if (!filename) {
+    if (!pdfUrl && !filename) {
       setError("No PDF file specified");
       return;
     }
@@ -33,12 +34,16 @@ export default function PDFViewerPage() {
     const loadPDF = async () => {
       try {
         setLoading(true);
-        const pdf = await pdfjsLib.getDocument(`/api/pdf/${filename}`).promise;
+        // Use B2 URL if available, otherwise use local API endpoint
+        const source = pdfUrl || `/api/pdf/${filename}`;
+        console.log("[v0] Loading PDF from:", source);
+        
+        const pdf = await pdfjsLib.getDocument(source).promise;
         setPdfDoc(pdf);
         setTotalPages(pdf.numPages);
         setCurrentPage(1);
       } catch (err) {
-        console.error("Error loading PDF:", err);
+        console.error("[v0] Error loading PDF:", err);
         setError("Failed to load PDF. Please try again.");
       } finally {
         setLoading(false);
@@ -46,7 +51,7 @@ export default function PDFViewerPage() {
     };
 
     loadPDF();
-  }, [filename]);
+  }, [pdfUrl, filename]);
 
   // Render page
   useEffect(() => {
@@ -95,9 +100,9 @@ export default function PDFViewerPage() {
   };
 
   const handleDownload = () => {
-    if (!filename) return;
+    if (!pdfUrl && !filename) return;
     const link = document.createElement("a");
-    link.href = `/api/pdf/${filename}`;
+    link.href = pdfUrl || `/api/pdf/${filename}`;
     link.download = filename;
     link.click();
   };
