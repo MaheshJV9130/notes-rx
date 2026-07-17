@@ -59,9 +59,9 @@ export async function POST(req) {
       b2ThumbnailId
     } = body;
 
-    if (!title || !subject || !chapter || !year || !pdfFileName || !uploadedBy || !pdfUrl) {
+    if (!title || !chapter || !year || !pdfFileName || !uploadedBy || !pdfUrl) {
       return NextResponse.json(
-        { message: "Missing required fields" },
+        { message: "Missing required fields: title, chapter, year, pdfFileName, uploadedBy, pdfUrl" },
         { status: 400 }
       );
     }

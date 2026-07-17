@@ -265,6 +265,16 @@ function UploadNotesTab() {
       return;
     }
 
+    if (!formData.title.trim()) {
+      setMessage("Please enter a note title");
+      return;
+    }
+
+    if (!formData.chapter.trim()) {
+      setMessage("Please enter a chapter name");
+      return;
+    }
+
     setLoading(true);
     setMessage("");
 
@@ -273,44 +283,60 @@ function UploadNotesTab() {
       const uploadFormData = new FormData();
       uploadFormData.append("file", file);
 
+      console.log("[v0] Uploading file:", file.name);
       const uploadRes = await fetch("/api/upload", {
         method: "POST",
         body: uploadFormData,
       });
 
+      console.log("[v0] Upload response status:", uploadRes.status);
       if (!uploadRes.ok) {
-        throw new Error("File upload failed");
+        const errorData = await uploadRes.json();
+        console.error("[v0] Upload error response:", errorData);
+        throw new Error(errorData.message || "File upload failed");
       }
 
       const uploadData = await uploadRes.json();
+      console.log("[v0] Upload successful:", uploadData);
 
       // Create note record
       const admin = JSON.parse(localStorage.getItem("adminUser"));
 
+      const notePayload = {
+        title: formData.title,
+        description: formData.description,
+        subject: formData.subject || null,
+        chapter: formData.chapter,
+        year: formData.year,
+        pdfFileName: uploadData.filename,
+        pdfSize: uploadData.size,
+        pdfUrl: uploadData.pdfUrl,
+        thumbnailUrl: uploadData.thumbnailUrl,
+        b2FileId: uploadData.b2FileId,
+        b2ThumbnailId: uploadData.b2ThumbnailId,
+        uploadedBy: admin._id,
+      };
+
+      console.log("[v0] Creating note with payload:", notePayload);
       const noteRes = await fetch("/api/notes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          pdfFileName: uploadData.filename,
-          pdfSize: uploadData.size,
-          pdfUrl: uploadData.pdfUrl,
-          thumbnailUrl: uploadData.thumbnailUrl,
-          b2FileId: uploadData.b2FileId,
-          b2ThumbnailId: uploadData.b2ThumbnailId,
-          uploadedBy: admin._id,
-        }),
+        body: JSON.stringify(notePayload),
       });
 
+      console.log("[v0] Note creation response status:", noteRes.status);
       if (!noteRes.ok) {
-        throw new Error("Failed to create note record");
+        const errorData = await noteRes.json();
+        console.error("[v0] Note creation error:", errorData);
+        throw new Error(errorData.message || "Failed to create note record");
       }
 
+      console.log("[v0] Note created successfully");
       setMessage("Note uploaded successfully!");
       setFormData({ title: "", description: "", subject: "", chapter: "", year: 1 });
       setFile(null);
     } catch (error) {
-      console.error("Upload error:", error);
+      console.error("[v0] Upload error:", error);
       setMessage("Error uploading note: " + error.message);
     } finally {
       setLoading(false);
