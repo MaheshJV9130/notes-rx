@@ -2,54 +2,31 @@ import database from "@/utils/database";
 import Subject from "@/model/Subject";
 import { NextResponse } from "next/server";
 
-export async function GET(req, { params }) {
+export async function GET(req) {
   try {
     await database();
-    const { year } = await params;
+    const subjects = await Subject.find().select("-__v").sort({ year: 1, name: 1 }).lean();
 
-    // Check if it's a MongoDB ObjectId (24 hex characters) - individual subject
-    const isMongoId = /^[0-9a-fA-F]{24}$/.test(year);
-
-    if (isMongoId) {
-      // Fetch individual subject by ID
-      const subject = await Subject.findById(year).select("-__v");
-
-      if (!subject) {
-        return NextResponse.json(
-          { message: "Subject not found" },
-          { status: 404 }
-        );
-      }
-
-      return NextResponse.json(subject, { status: 200 });
-    }
-
-    // Otherwise treat it as year filter
-    const parsedYear = parseInt(year, 10);
-
-    if (isNaN(parsedYear) || parsedYear < 1 || parsedYear > 4) {
+    if (!subjects || subjects.length === 0) {
       return NextResponse.json(
-        { message: "Invalid year. Please provide a year between 1 and 4", data: [] },
-        { status: 400 }
+        { message: "No subjects found", data: [] },
+        { status: 200 }
       );
     }
 
-    const subjects = await Subject.find({ year: parsedYear }).select("-__v");
-
-    return NextResponse.json(subjects || [], { status: 200 });
+    return NextResponse.json(subjects, { status: 200 });
   } catch (error) {
     console.error("Error fetching subjects:", error);
     return NextResponse.json(
-      { message: "Error fetching subjects", data: [], error: error.message },
+      { message: "Error fetching subjects", error: error.message },
       { status: 500 }
     );
   }
 }
 
-export async function PUT(req, { params }) {
+export async function POST(req) {
   try {
     await database();
-    const { year: id } = await params;
     const body = await req.json();
 
     const { name, code, description, year, department } = body;
@@ -61,6 +38,58 @@ export async function PUT(req, { params }) {
       );
     }
 
+    const existingSubject = await Subject.findOne({ code });
+    if (existingSubject) {
+      return NextResponse.json(
+        { message: "Subject code already exists" },
+        { status: 409 }
+      );
+    }
+
+    const newSubject = new Subject({
+      name,
+      code,
+      description,
+      year,
+      department,
+    });
+
+    const savedSubject = await newSubject.save();
+
+    return NextResponse.json(
+      { message: "Subject created successfully", data: savedSubject },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Error creating subject:", error);
+    return NextResponse.json(
+      { message: "Error creating subject", error: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(req) {
+  try {
+    await database();
+    const body = await req.json();
+    const { id, name, code, description, year, department } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "Subject ID is required" },
+        { status: 400 }
+      );
+    }
+
+    if (!name || !code || !year || !department) {
+      return NextResponse.json(
+        { message: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    // Check if new code already exists (and it's not the same subject)
     const existingSubject = await Subject.findOne({ code, _id: { $ne: id } });
     if (existingSubject) {
       return NextResponse.json(
@@ -102,10 +131,18 @@ export async function PUT(req, { params }) {
   }
 }
 
-export async function DELETE(req, { params }) {
+export async function DELETE(req) {
   try {
     await database();
-    const { year: id } = await params;
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "Subject ID is required" },
+        { status: 400 }
+      );
+    }
 
     const deletedSubject = await Subject.findByIdAndDelete(id);
 

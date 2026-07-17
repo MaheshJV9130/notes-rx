@@ -10,24 +10,28 @@ import { IoIosContacts } from "react-icons/io";
 const Navbar = () => {
   const pathname = usePathname();
 
-  // Hide navbar on subject pages for better PDF readability
-  if (pathname && (pathname.startsWith("/subject") || pathname.startsWith("/subjects"))) return null;
+  // Hide navbar on subject pages and PDF viewer for better readability
+  if (pathname && (pathname.startsWith("/subject") || pathname.startsWith("/subjects") || pathname.startsWith("/view") || pathname.startsWith("/admin"))) return null;
   const impNav = [
     {
       icon: <IoHomeSharp size={25} />,
       name: "home",
+      path: "",
     },
     {
       icon: <IoLibrary size={25} />,
-      name: "library",
+      name: "notes",
+      path: "notes",
     },
     {
       icon: <IoIosContacts size={25} />,
       name: "contact",
+      path: "contact",
     },
     {
       icon: <IoCartSharp size={25} />,
       name: "store",
+      path: "store",
     },
   ];
   return (
@@ -47,7 +51,7 @@ const Navbar = () => {
           {impNav.map((nav, index) => (
             <li key={index}>
               <Link
-                href={`/${nav.name === "home" ? "" : nav.name}`}
+                href={`/${nav.path}`}
                 className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
               >
                 <span className="text-blue-500/70">{nav.icon}</span>
@@ -55,10 +59,18 @@ const Navbar = () => {
               </Link>
             </li>
           ))}
+          <li className="ml-4 pl-4 border-l border-gray-600">
+            <Link
+              href="/admin-login"
+              className="flex items-center gap-2 text-gray-300 hover:text-blue-400 transition-colors font-semibold"
+            >
+              Admin Panel
+            </Link>
+          </li>
         </ol>
         <div>
           <Button>Sign In</Button>
-          <Button varient={"primary"}>Sign Up</Button>
+          <Button variant={"primary"}>Sign Up</Button>
         </div>
       </nav>
     </header>

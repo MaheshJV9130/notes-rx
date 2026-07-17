@@ -1,0 +1,146 @@
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Define styles -->
+  <defs>
+    <style>
+      .box { fill: #f0f4f8; stroke: #2d3748; stroke-width: 2; }
+      .client-box { fill: #bee3f8; stroke: #2c5aa0; stroke-width: 2; }
+      .server-box { fill: #c6f6d5; stroke: #22543d; stroke-width: 2; }
+      .db-box { fill: #feebc8; stroke: #7c2d12; stroke-width: 2; }
+      .text { font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #1a202c; }
+      .title { font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; fill: #1a202c; }
+      .small-text { font-family: Arial, sans-serif; font-size: 12px; fill: #4a5568; }
+      .arrow { stroke: #4a5568; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .label-arrow { font-family: Arial, sans-serif; font-size: 11px; fill: #2d3748; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#4a5568" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="600" y="30" font-size="24" font-weight="bold" text-anchor="middle" fill="#1a202c">
+    Notes RX - System Architecture Diagram
+  </text>
+
+  <!-- CLIENT LAYER -->
+  <text x="50" y="70" class="title">CLIENT LAYER</text>
+  
+  <!-- User Browser -->
+  <rect x="50" y="90" width="200" height="100" class="client-box" rx="5"/>
+  <text x="150" y="125" class="text" text-anchor="middle">User Browser</text>
+  <text x="150" y="145" class="small-text" text-anchor="middle">Notes Viewer</text>
+  <text x="150" y="160" class="small-text" text-anchor="middle">Filter & Search</text>
+  <text x="150" y="175" class="small-text" text-anchor="middle">PDF Rendering</text>
+
+  <!-- Admin Browser -->
+  <rect x="300" y="90" width="200" height="100" class="client-box" rx="5"/>
+  <text x="400" y="125" class="text" text-anchor="middle">Admin Browser</text>
+  <text x="400" y="145" class="small-text" text-anchor="middle">Upload PDFs</text>
+  <text x="400" y="160" class="small-text" text-anchor="middle">Manage Notes</text>
+  <text x="400" y="175" class="small-text" text-anchor="middle">Organize Data</text>
+
+  <!-- NEXT.JS SERVER LAYER -->
+  <text x="50" y="270" class="title">NEXT.JS SERVER LAYER</text>
+  
+  <!-- Pages -->
+  <rect x="50" y="290" width="180" height="90" class="server-box" rx="5"/>
+  <text x="140" y="315" class="text" text-anchor="middle">Pages</text>
+  <text x="140" y="335" class="small-text" text-anchor="middle">/notes</text>
+  <text x="140" y="350" class="small-text" text-anchor="middle">/admin</text>
+  <text x="140" y="365" class="small-text" text-anchor="middle">/view</text>
+
+  <!-- API Routes -->
+  <rect x="280" y="290" width="180" height="90" class="server-box" rx="5"/>
+  <text x="370" y="315" class="text" text-anchor="middle">API Routes</text>
+  <text x="370" y="335" class="small-text" text-anchor="middle">/api/notes</text>
+  <text x="370" y="350" class="small-text" text-anchor="middle">/api/upload</text>
+  <text x="370" y="365" class="small-text" text-anchor="middle">/api/subjects</text>
+
+  <!-- Middleware -->
+  <rect x="510" y="290" width="180" height="90" class="server-box" rx="5"/>
+  <text x="600" y="315" class="text" text-anchor="middle">Middleware</text>
+  <text x="600" y="335" class="small-text" text-anchor="middle">Auth Check</text>
+  <text x="600" y="350" class="small-text" text-anchor="middle">Request Log</text>
+  <text x="600" y="365" class="small-text" text-anchor="middle">Rate Limit</text>
+
+  <!-- PDF Handler -->
+  <rect x="740" y="290" width="180" height="90" class="server-box" rx="5"/>
+  <text x="830" y="315" class="text" text-anchor="middle">PDF Handler</text>
+  <text x="830" y="335" class="small-text" text-anchor="middle">Blob Stream</text>
+  <text x="830" y="350" class="small-text" text-anchor="middle">File Upload</text>
+  <text x="830" y="365" class="small-text" text-anchor="middle">Validation</text>
+
+  <!-- DATABASE LAYER -->
+  <text x="50" y="490" class="title">DATABASE LAYER - MongoDB</text>
+  
+  <!-- Collections -->
+  <rect x="50" y="510" width="150" height="85" class="db-box" rx="5"/>
+  <text x="125" y="535" class="text" text-anchor="middle">Notes</text>
+  <text x="125" y="553" class="small-text" text-anchor="middle">_id, title</text>
+  <text x="125" y="568" class="small-text" text-anchor="middle">subject, year</text>
+  <text x="125" y="583" class="small-text" text-anchor="middle">chapter, pdfUrl</text>
+
+  <rect x="230" y="510" width="150" height="85" class="db-box" rx="5"/>
+  <text x="305" y="535" class="text" text-anchor="middle">Subjects</text>
+  <text x="305" y="553" class="small-text" text-anchor="middle">_id, name</text>
+  <text x="305" y="568" class="small-text" text-anchor="middle">code, year</text>
+  <text x="305" y="583" class="small-text" text-anchor="middle">description</text>
+
+  <rect x="410" y="510" width="150" height="85" class="db-box" rx="5"/>
+  <text x="485" y="535" class="text" text-anchor="middle">Chapters</text>
+  <text x="485" y="553" class="small-text" text-anchor="middle">_id, number</text>
+  <text x="485" y="568" class="small-text" text-anchor="middle">title, subject</text>
+  <text x="485" y="583" class="small-text" text-anchor="middle">description</text>
+
+  <rect x="590" y="510" width="150" height="85" class="db-box" rx="5"/>
+  <text x="665" y="535" class="text" text-anchor="middle">Admin Users</text>
+  <text x="665" y="553" class="small-text" text-anchor="middle">_id, email</text>
+  <text x="665" y="568" class="small-text" text-anchor="middle">password, role</text>
+  <text x="665" y="583" class="small-text" text-anchor="middle">createdAt</text>
+
+  <!-- FILE STORAGE -->
+  <text x="900" y="490" class="title">FILE STORAGE</text>
+  
+  <rect x="900" y="510" width="150" height="85" class="box" rx="5"/>
+  <text x="975" y="535" class="text" text-anchor="middle">File System</text>
+  <text x="975" y="553" class="small-text" text-anchor="middle">PDF Files</text>
+  <text x="975" y="568" class="small-text" text-anchor="middle">Blob Storage</text>
+  <text x="975" y="583" class="small-text" text-anchor="middle">Streaming</text>
+
+  <!-- ARROWS & CONNECTIONS -->
+  <!-- User to Pages -->
+  <path d="M 150 190 L 140 290" class="arrow"/>
+  <text x="155" y="240" class="label-arrow">HTTP Request</text>
+
+  <!-- Admin to API -->
+  <path d="M 400 190 L 370 290" class="arrow"/>
+  <text x="405" y="240" class="label-arrow">HTTP Request</text>
+
+  <!-- Pages to API -->
+  <path d="M 230 335 L 280 335" class="arrow"/>
+  
+  <!-- API to Middleware -->
+  <path d="M 460 335 L 510 335" class="arrow"/>
+
+  <!-- API to PDF Handler -->
+  <path d="M 550 320 L 740 320" class="arrow"/>
+
+  <!-- Server to Database -->
+  <path d="M 140 380 L 125 510" class="arrow"/>
+  <text x="145" y="445" class="label-arrow">Query/Insert</text>
+
+  <path d="M 370 380 L 305 510" class="arrow"/>
+  <path d="M 600 380 L 485 510" class="arrow"/>
+  <path d="M 830 380 L 665 510" class="arrow"/>
+
+  <!-- API to File Storage -->
+  <path d="M 870 320 L 900 530" class="arrow"/>
+  <text x="880" y="425" class="label-arrow">Upload/Stream</text>
+
+  <!-- LEGEND -->
+  <text x="50" y="720" class="title">Data Flow:</text>
+  <text x="50" y="745" class="small-text">1. User/Admin sends request to Next.js Pages or API Routes</text>
+  <text x="50" y="762" class="small-text">2. Pages/APIs process with Middleware and PDF Handler</text>
+  <text x="600" y="745" class="small-text">3. Data queried from MongoDB collections</text>
+  <text x="600" y="762" class="small-text">4. PDFs streamed as blobs, not downloaded</text>
+</svg>
